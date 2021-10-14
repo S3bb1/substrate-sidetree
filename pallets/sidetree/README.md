@@ -10,6 +10,7 @@ The pallet supports one single extrinsic called `anchor_hash`. This extrinsic mu
 The struct contains two properties
 
 `hash` -> This is the Core Index File Hash which points to the IPFS File
+
 `operations` -> This is the total number of Operaions which are included in the Core Index File
 
 In the current version a Per-Operation Fee is set to a fixed weight of 20_000 per operation. The more operations a Core Index File contains, the extrinsics weight increases multiplied by the amount of operations.
