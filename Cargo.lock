@@ -3553,6 +3553,7 @@ dependencies = [
  "pallet-balances",
  "pallet-grandpa",
  "pallet-randomness-collective-flip",
+ "pallet-sidetree",
  "pallet-sudo",
  "pallet-template",
  "pallet-timestamp",
@@ -3826,6 +3827,20 @@ dependencies = [
  "sp-staking",
  "sp-std",
  "sp-trie",
+]
+
+[[package]]
+name = "pallet-sidetree"
+version = "3.0.0-monthly-2021-10"
+dependencies = [
+ "frame-benchmarking",
+ "frame-support",
+ "frame-system",
+ "parity-scale-codec",
+ "scale-info",
+ "sp-core",
+ "sp-io",
+ "sp-runtime",
 ]
 
 [[package]]
