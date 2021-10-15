@@ -10,7 +10,7 @@ use frame_benchmarking::{
 use frame_system::RawOrigin;
 
 benchmarks! {
-	do_something {
+	anchor_hash {
 		let s in 0 .. 100;
 		let hash = Vec::<u8>::new();
 		let anchor = Anchor {
@@ -20,9 +20,6 @@ benchmarks! {
 		// The caller account is whitelisted for DB reads/write by the benchmarking macro.
 		let caller: T::AccountId = whitelisted_caller();
 	}: _(RawOrigin::Signed(caller), anchor)
-	verify {
-		assert_eq!(TransactionNumber::<T>::get(), s + 1);
-	}
 }
 
 impl_benchmark_test_suite!(SidetreePallet, crate::mock::new_test_ext(), crate::mock::Test);

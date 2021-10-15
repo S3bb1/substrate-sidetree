@@ -1,6 +1,5 @@
 #![cfg_attr(not(feature = "std"), no_std)]
 pub use pallet::*;
-
 #[cfg(test)]
 mod mock;
 
@@ -10,16 +9,17 @@ mod tests;
 #[cfg(feature = "runtime-benchmarks")]
 mod benchmarking;
 
+pub mod weights;
+pub use crate::weights::WeightInfo;
 #[frame_support::pallet]
 pub mod pallet {
+	// Import various types used to declare pallet in scope.
+	use super::*;
 	use frame_support::{
-		dispatch::DispatchResult,
-		inherent::Vec,
-		pallet_prelude::*,
-		scale_info::TypeInfo,
+		dispatch::DispatchResult, inherent::Vec, pallet_prelude::*, scale_info::TypeInfo,
 		sp_runtime::SaturatedConversion,
-		weights::{ClassifyDispatch, PaysFee, WeighData},
 	};
+
 	use frame_system::pallet_prelude::*;
 
 	#[derive(Clone, Encode, Decode, PartialEq, RuntimeDebug, TypeInfo)]
@@ -28,30 +28,12 @@ pub mod pallet {
 		pub hash: Vec<u8>,
 		pub operations: u32,
 	}
-
-	struct OperationLength;
-	impl WeighData<(&Anchor,)> for OperationLength {
-		fn weigh_data(&self, target: (&Anchor,)) -> Weight {
-			// TODO: add storage access for base fee
-			(20_000 * target.0.operations).saturated_into::<Weight>()
-		}
-	}
-
-	impl<T> ClassifyDispatch<T> for OperationLength {
-		fn classify_dispatch(&self, _target: T) -> DispatchClass {
-			DispatchClass::Normal
-		}
-	}
-
-	impl<T> PaysFee<T> for OperationLength {
-		fn pays_fee(&self, _target: T) -> Pays {
-			Pays::Yes
-		}
-	}
-
 	#[pallet::config]
 	pub trait Config: frame_system::Config {
 		type Event: From<Event<Self>> + IsType<<Self as frame_system::Config>::Event>;
+
+		/// Information on runtime weights.
+		type WeightInfo: WeightInfo;
 	}
 
 	#[pallet::pallet]
@@ -91,7 +73,7 @@ pub mod pallet {
 	impl<T: Config> Pallet<T> {
 		// Main functionality to anchor a hash. The weight is determined by the number of operations
 		// multiplied by the BaseFee See https://identity.foundation/sidetree/spec/#base-fee-variable
-		#[pallet::weight(OperationLength)]
+		#[pallet::weight(T::WeightInfo::anchor_hash((anchor.operations).saturated_into()))]
 		pub fn anchor_hash(origin: OriginFor<T>, anchor: Anchor) -> DispatchResult {
 			// Someone has to sign the transaction
 			ensure_signed(origin)?;
